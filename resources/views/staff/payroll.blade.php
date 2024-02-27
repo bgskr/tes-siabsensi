@@ -23,7 +23,7 @@
                         <label for="name" class="col-sm-3 col-form-label">Tidak masuk (0.5%/hari)</label>
                         <div class="col-sm-4">
                             <input type="number" name="tidak_masuk" class="form-control" id="createTidakMasuk"
-                                placeholder="Jumlah Hari">
+                               value="{{20 - $karyawan->total_masuk['total_masuk']}}" max="20" placeholder="Jumlah Hari">
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -34,10 +34,10 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <label for="pph" class="col-sm-3 col-form-label">PPh 21</label>
+                        {{-- <label for="pph" class="col-sm-3 col-form-label">PPh 21</label> --}}
                         <div class="col-sm-8">
                             <input type="number" name="pph" class="form-control" id="createPph"
-                                placeholder="Jumlah Potongan PPh">
+                                placeholder="Jumlah Potongan PPh" hidden value="0">
                         </div>
                     </div>
             </div>

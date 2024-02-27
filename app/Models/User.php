@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -51,20 +53,34 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'id_roles', 'id');
     }
 
-    public function absensiKaryawan()
+public function absensiKaryawan()
 {
     return $this->hasMany(AbsensiKaryawan::class, 'id_karyawan', 'nip');
 }
 
 public function getTotalMasukAttribute()
 {
-    return $this->absensiKaryawan()->where('keterangan', 'Masuk')->count();
+    $month = now()->month;
+    $monthName = now()->format('F');
+    $totalMasuk = $this->absensiKaryawan()->where('keterangan', 'Masuk')->whereMonth('tanggal_masuk', $month)->count();
+
+    return ['month' => $monthName, 'total_masuk' => $totalMasuk];
 }
+
 
 public function getTotalIzinAttribute()
 {
-    return $this->absensiKaryawan()->where('keterangan', 'Izin')->count();
+    return $this->absensiKaryawan()->where('keterangan', 'Izin')->whereMonth('tanggal_masuk', now()->month)->count();
 }
 
+public function getMonthNameAttribute()
+{
+    $monthName = now()->format('F');
+    return $this->absensiKaryawan()->where('keterangan', 'Masuk')->whereMonth('tanggal_masuk', now()->month)->count();
+}
+
+public function count_day() {
+    return $this->absensiKaryawan()->where('keterangan', 'Masuk')->count();
+}
 
 }

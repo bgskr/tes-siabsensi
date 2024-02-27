@@ -30,7 +30,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helper/currencyHelper.php"
+            "app/Helper/currencyHelper.php",
+            "app/Helper/monthHelper.php"
         ]
     },
     "autoload-dev": {

@@ -53,6 +53,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('staff/payroll', [PayrollController::class, 'doPayroll'])->name('staff.payroll');
         /**Generate PDF */
         Route::get('staff/cetak', [PayrollController::class, 'generatePDF'])->name('export.pdf');
+        Route::get('staff/cetak/{id}', [PayrollController::class, 'generatePDFOne'])->name('export.pdf-one');
     });
     /**
      * Karyawan Role Routes

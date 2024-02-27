@@ -53,6 +53,9 @@ class PayrollController extends Controller
 
     public function absensiIndex() {
         $user = User::role('karyawan')->get();
+        // $monthName = $user->filter(getMonth('created_at'));
+        // dd($monthName);
+
         return view('staff.absensi-index', [
             'data' => $user
         ]);
@@ -85,19 +88,31 @@ class PayrollController extends Controller
         $validated = $request->validate([
             'nip_pegawai' => '',
             'tidak_masuk' => 'integer|max:20',
-            'telat' => 'integer|max:20',
+            'telat' => 'max:20',
             'pph' => 'integer',
         ]);
 
-        $dataKaryawan = User::where('nip', $request->input('nip_pegawai'))->first();
-        $costAbsence = ((0.005 * $dataKaryawan->salary) * $validated['tidak_masuk']);
-        $costLate = ((0.001 * $dataKaryawan->salary) * $validated['telat']);
-        $costPPh = $validated['pph'];
-        $totalCost = $costAbsence + $costLate + $costPPh;
-        $totalSalary = $dataKaryawan->salary - $totalCost;
+        if ($validated['telat'] == '') {
+            $validated['telat'] = 0;
+        }
 
-        $validated['total_potongan'] = $totalCost;
+        $dataKaryawan = User::where('nip', $request->input('nip_pegawai'))->first();
+        $perDay = $dataKaryawan->salary / 20;
+
+        $costAbsence = $perDay * $validated['tidak_masuk'];
+        $costLate = ($perDay / 2) * $validated['telat'];
+        // $costPPh = $validated['pph'];
+        $work = (20 - $validated['tidak_masuk'] - $validated['telat']);
+
+        $totalCost = $costAbsence + $costLate;
+        $totalSalary = ($perDay * $work);
+
         $validated['total_salary'] = $totalSalary;
+
+                if ($totalSalary <= 0) {
+                    $validated['total_salary'] = 0;
+                }
+        $validated['total_potongan'] = $totalCost;
         $dataPayroll = Payroll::create($validated);
 
         if($dataPayroll) {
@@ -148,7 +163,17 @@ class PayrollController extends Controller
         //     'total_cost' => $allPayroll->total_potongan,
         //     'total_salary' => $allPayroll->total_salary,
         // ]);
-        return $pdf->download('tested.pdf');
+        return $pdf->stream('tested.pdf');
+    }
+
+    public function generatePDFOne($id) {
+        $print = Payroll::where('nip_pegawai', $id)->first();
+        // dd($print);
+        $pdf = Pdf::loadView('pdf.payroll-one', [
+            'data' => $print
+        ]);
+
+        return $pdf->stream('tested-person-' . $id . '.pdf');
     }
 
 }

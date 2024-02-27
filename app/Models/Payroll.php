@@ -27,4 +27,5 @@ class Payroll extends Model
     public function payroll_name() {
         return $this->belongsTo(User::class, 'nip_pegawai', 'nip');
     }
+
 }

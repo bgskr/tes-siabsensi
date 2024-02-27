@@ -22,5 +22,5 @@ class AbsensiKaryawan extends Model
         'updated_at'
     ];
 
-    
+
 }
